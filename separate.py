@@ -60,41 +60,9 @@ def main():
     train_data = pd.concat([X_train, y_train], axis=1)
     valid_data = pd.concat([X_valid, y_valid], axis=1)
 
-    # Save the raw split data to CSV files
-    X_train.to_csv("./resources/data_training.csv", index=False)
-    X_valid.to_csv("./resources/data_validation.csv", index=False)
-
-    visualize_data()
-
-
-def visualize_data():
-    # Read the data
-    data = pd.read_csv("./resources/data.csv")
-
-    # Compute the correlation matrix
-    corr = data.corr()
-
-    # Set up the matplotlib figure
-    plt.figure(figsize=(20, 16))
-
-    # Create a heatmap
-    sns.heatmap(
-        corr,
-        cmap="coolwarm",
-        annot=False,
-        fmt=".2f",
-        square=True,
-        linewidths=0.5,
-        cbar_kws={"shrink": 0.5},
-    )
-
-    # Set the title
-    plt.title("Correlation Heatmap of Features", fontsize=16)
-
-    # Adjust layout and save the figure
-    plt.tight_layout()
-    plt.savefig("./resources/correlation_heatmap.png")
-    plt.close()
+    # save the data
+    train_data.to_csv("./resources/data_training.csv", index=False)
+    valid_data.to_csv("./resources/data_validation.csv", index=False)
 
 
 if __name__ == "__main__":
