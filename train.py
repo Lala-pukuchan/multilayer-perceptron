@@ -40,8 +40,7 @@ def train(
 
     # initialize MLP
     mlp = MLP(layers)
-    mlp.forward_propagation(X_train)
-    mlp.back_propagation(y_train_2d_array, learning_rate)
+    mlp.fit(X_train, y_train_2d_array, epochs, learning_rate)
 
 
 
@@ -59,11 +58,11 @@ def main():
         default=[24, 24],
         help="Layer size and neuron size of each in hidden layer",
     )
-    parser.add_argument("--epochs", type=int, default=100, help="Number of epochs")
+    parser.add_argument("--epochs", type=int, default=1000, help="Number of epochs")
     parser.add_argument("--loss", type=str, default="binary_crossentropy", help="Loss function")
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size")
     parser.add_argument(
-        "--learning_rate", type=float, default=0.01, help="Learning rate"
+        "--learning_rate", type=float, default=0.1, help="Learning rate"
     )
 
     args = parser.parse_args()

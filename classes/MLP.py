@@ -103,26 +103,17 @@ class MLP:
             # forward propagation
             self.forward_propagation(X)
 
+            # back propagation
+            self.back_propagation(y, learning_rate)
+
             # compute loss
             loss = self.compute_loss(y, self.a[-1])
 
-            # back propagation
-            self.back_propagation(X, y, learning_rate)
+            # compute accuracy
+            y_pred = np.argmax(self.a[-1], axis=1)
+            accuracy = np.mean(y_pred == np.argmax(y, axis=1))
 
             # print loss
             if epoch % 10 == 0:
                 print(f"Epoch {epoch}, Loss: {loss}")
-
-    def print_layers(self):
-        """
-        print the layers
-        """
-        for i in range(len(self.layers)):
-            print(f"Layer {i}: {self.layers[i]}")
-
-        for i, (w, b) in enumerate(zip(self.weights, self.biases)):
-            print(f"\nLayer {i} to {i+1}:")
-            print(f"Weight shape: {w.shape}")
-            print(f"Weight sample:\n{w}")
-            print(f"Bias shape: {b.shape}")
-            print(f"Bias sample:\n{b}")
+                print(f"Accuracy: {accuracy}")
