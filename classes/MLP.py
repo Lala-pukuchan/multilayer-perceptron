@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 class MLP:
@@ -107,11 +108,16 @@ class MLP:
         """
         train the model
         """
+        train_losses = []
+        val_losses = []
+        train_accuracies = []
+        val_accuracies = []
+
         for epoch in range(epochs):
             # forward propagation on training data
             self.forward_propagation(X_train)
 
-            # compute training loss
+            # compute training loss and accuracy
             train_loss = self.compute_loss(y_train, self.a[-1])
             train_accuracy = self.compute_accuracy(y_train, self.a[-1])
 
@@ -121,11 +127,41 @@ class MLP:
             # forward propagation on validation data
             self.forward_propagation(X_valid)
 
-            # compute validation loss
+            # compute validation loss and accuracy
             val_loss = self.compute_loss(y_valid, self.a[-1])
             val_accuracy = self.compute_accuracy(y_valid, self.a[-1])
 
+            # store losses and accuracies
+            train_losses.append(train_loss)
+            val_losses.append(val_loss)
+            train_accuracies.append(train_accuracy)
+            val_accuracies.append(val_accuracy)
+
             # print losses and accuracies
-            print(
-                f"Epoch {epoch+1}/{epochs} - loss: {train_loss:.4f} - val_loss: {val_loss:.4f} - acc: {train_accuracy:.4f} - val_acc: {val_accuracy:.4f}"
-            )
+            print(f"Epoch {epoch+1}/{epochs} - loss: {train_loss:.4f} - val_loss: {val_loss:.4f} - acc: {train_accuracy:.4f} - val_acc: {val_accuracy:.4f}")
+
+        # Plotting the results
+        epochs_range = range(1, epochs + 1)
+
+        plt.figure(figsize=(12, 5))
+
+        # Plot loss
+        plt.subplot(1, 2, 1)
+        plt.plot(epochs_range, train_losses, label='Training Loss')
+        plt.plot(epochs_range, val_losses, label='Validation Loss')
+        plt.xlabel('Epochs')
+        plt.ylabel('Loss')
+        plt.title('Loss over Epochs')
+        plt.legend()
+
+        # Plot accuracy
+        plt.subplot(1, 2, 2)
+        plt.plot(epochs_range, train_accuracies, label='Training Accuracy')
+        plt.plot(epochs_range, val_accuracies, label='Validation Accuracy')
+        plt.xlabel('Epochs')
+        plt.ylabel('Accuracy')
+        plt.title('Accuracy over Epochs')
+        plt.legend()
+
+        plt.tight_layout()
+        plt.show()
