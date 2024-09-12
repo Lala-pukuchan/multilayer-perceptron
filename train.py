@@ -22,6 +22,12 @@ def train(
     # Standarize data
     X_train = (X_train - X_train.mean()) / X_train.std()
 
+    # convert to 2d numpy array
+    num_samples = y_train.shape[0]
+    num_classes = 2
+    y_train_2d_array = np.zeros((num_samples, num_classes))
+    y_train_2d_array[np.arange(num_samples), y_train] = 1
+
     # define layers
     layers = [X_train.shape[1], *hidden_layers_neuron, 2]
 
@@ -30,11 +36,12 @@ def train(
     print(f"epochs: {epochs}")
     print(f"batch_size: {batch_size}")
     print(f"learning_rate: {learning_rate}")
+    print(f"y_train_2d_array: {y_train_2d_array.shape}")
 
     # initialize MLP
     mlp = MLP(layers)
     mlp.forward_propagation(X_train)
-    mlp.back_propagation(y_train, learning_rate)
+    mlp.back_propagation(y_train_2d_array, learning_rate)
 
 
 
