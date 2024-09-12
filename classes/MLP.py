@@ -61,7 +61,7 @@ class MLP:
         a = self.softmax(z)
         self.a.append(a)
 
-    def back_propagation(self, X, y, learning_rate):
+    def back_propagation(self, y, learning_rate):
         """
         back propagation
         """

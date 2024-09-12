@@ -34,7 +34,7 @@ def train(
     # initialize MLP
     mlp = MLP(layers)
     mlp.forward_propagation(X_train)
-    mlp.back_propagation(y_train)
+    mlp.back_propagation(y_train, learning_rate)
 
 
 
