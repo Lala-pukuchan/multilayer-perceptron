@@ -5,6 +5,29 @@ import pandas as pd
 import os
 
 
+def create_data(data):
+    """
+    Create data for training/validation
+    """
+
+    print("data: ", data)
+
+    # split data to X and y
+    X = data.drop("diagnosis", axis=1)
+    y = data["diagnosis"]
+
+    # Standarize data
+    X = (X - X.mean()) / X.std()
+
+    # convert to 2d numpy array
+    num_samples = y.shape[0]
+    num_classes = 2
+    y_2d_array = np.zeros((num_samples, num_classes))
+    y_2d_array[np.arange(num_samples), y] = 1
+
+    return X, y_2d_array
+
+
 def train(
     hidden_layers_neuron,
     epochs,
@@ -12,21 +35,17 @@ def train(
     batch_size,
     learning_rate,
 ):
+    """
+    Train MLP model
+    """
     # import data
-    data = pd.read_csv("resources/data_training.csv")
+    data_train = pd.read_csv("resources/data_training.csv")
+    X_train, y_train_2d_array = create_data(data_train)
+    data_valid = pd.read_csv("resources/data_validation.csv")
+    X_valid, y_valid_2d_array = create_data(data_valid)
 
-    # split data to X and y
-    X_train = data.drop("diagnosis", axis=1)
-    y_train = data["diagnosis"]
-
-    # Standarize data
-    X_train = (X_train - X_train.mean()) / X_train.std()
-
-    # convert to 2d numpy array
-    num_samples = y_train.shape[0]
-    num_classes = 2
-    y_train_2d_array = np.zeros((num_samples, num_classes))
-    y_train_2d_array[np.arange(num_samples), y_train] = 1
+    if X_train is None:
+        raise ValueError("create_data returned None")
 
     # define layers
     layers = [X_train.shape[1], *hidden_layers_neuron, 2]
@@ -40,13 +59,14 @@ def train(
 
     # initialize MLP
     mlp = MLP(layers)
-    mlp.fit(X_train, y_train_2d_array, epochs, learning_rate)
-
+    mlp.fit(X_train, y_train_2d_array, X_valid, y_valid_2d_array, epochs, learning_rate)
 
 
 def main():
 
-    if not os.path.exists("resources/data_training.csv"):
+    if not os.path.exists("resources/data_training.csv") or not os.path.exists(
+        "resources/data_validation.csv"
+    ):
         print("resources/data_training.csv not found.")
         return
 
@@ -59,7 +79,9 @@ def main():
         help="Layer size and neuron size of each in hidden layer",
     )
     parser.add_argument("--epochs", type=int, default=1000, help="Number of epochs")
-    parser.add_argument("--loss", type=str, default="binary_crossentropy", help="Loss function")
+    parser.add_argument(
+        "--loss", type=str, default="binary_crossentropy", help="Loss function"
+    )
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size")
     parser.add_argument(
         "--learning_rate", type=float, default=0.1, help="Learning rate"

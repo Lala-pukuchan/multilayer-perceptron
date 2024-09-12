@@ -94,26 +94,38 @@ class MLP:
         loss = -np.mean(y * np.log(y_pred) + (1 - y) * np.log(1 - y_pred))
         return loss
 
-    def fit(self, X, y, epochs, learning_rate):
+    def compute_accuracy(self, y, y_pred):
+        """
+        Compute the accuracy
+        """
+        predictions = np.argmax(y_pred, axis=1)
+        labels = np.argmax(y, axis=1)
+        accuracy = np.mean(predictions == labels)
+        return accuracy
+
+    def fit(self, X_train, y_train, X_valid, y_valid, epochs, learning_rate):
         """
         train the model
         """
-        # for each epoch
         for epoch in range(epochs):
-            # forward propagation
-            self.forward_propagation(X)
+            # forward propagation on training data
+            self.forward_propagation(X_train)
+
+            # compute training loss
+            train_loss = self.compute_loss(y_train, self.a[-1])
+            train_accuracy = self.compute_accuracy(y_train, self.a[-1])
 
             # back propagation
-            self.back_propagation(y, learning_rate)
+            self.back_propagation(y_train, learning_rate)
 
-            # compute loss
-            loss = self.compute_loss(y, self.a[-1])
+            # forward propagation on validation data
+            self.forward_propagation(X_valid)
 
-            # compute accuracy
-            y_pred = np.argmax(self.a[-1], axis=1)
-            accuracy = np.mean(y_pred == np.argmax(y, axis=1))
+            # compute validation loss
+            val_loss = self.compute_loss(y_valid, self.a[-1])
+            val_accuracy = self.compute_accuracy(y_valid, self.a[-1])
 
-            # print loss
-            if epoch % 10 == 0:
-                print(f"Epoch {epoch}, Loss: {loss}")
-                print(f"Accuracy: {accuracy}")
+            # print losses and accuracies
+            print(
+                f"Epoch {epoch+1}/{epochs} - loss: {train_loss:.4f} - val_loss: {val_loss:.4f} - acc: {train_accuracy:.4f} - val_acc: {val_accuracy:.4f}"
+            )
