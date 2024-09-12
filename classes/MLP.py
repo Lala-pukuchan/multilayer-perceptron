@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import pickle
 
 
 class MLP:
@@ -165,3 +166,25 @@ class MLP:
 
         plt.tight_layout()
         plt.show()
+
+    def save_model(self, file_path):
+        """
+        Save the model to a file
+        """
+        model_data = {
+            'layers': self.layers,
+            'weights': self.weights,
+            'biases': self.biases
+        }
+        with open(file_path, 'wb') as file:
+            pickle.dump(model_data, file)
+
+    def load_model(self, file_path):
+        """
+        Load the model from a file
+        """
+        with open(file_path, 'rb') as file:
+            model_data = pickle.load(file)
+            self.layers = model_data['layers']
+            self.weights = model_data['weights']
+            self.biases = model_data['biases']

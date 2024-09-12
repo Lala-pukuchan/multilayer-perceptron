@@ -60,7 +60,7 @@ def train(
     # initialize MLP
     mlp = MLP(layers)
     mlp.fit(X_train, y_train_2d_array, X_valid, y_valid_2d_array, epochs, learning_rate)
-
+    mlp.save_model("resources/mlp_model.pkl")
 
 def main():
 
