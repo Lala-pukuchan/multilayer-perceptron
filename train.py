@@ -72,7 +72,7 @@ def main():
 
     parser = argparse.ArgumentParser(description="Train MLP model")
     parser.add_argument(
-        "--hidden_layers_neuron",
+        "--layer",
         nargs="+",
         type=int,
         default=[24, 24],
@@ -90,7 +90,7 @@ def main():
     args = parser.parse_args()
 
     train(
-        hidden_layers_neuron=args.hidden_layers_neuron,
+        hidden_layers_neuron=args.layer,
         epochs=args.epochs,
         loss=args.loss,
         batch_size=args.batch_size,
