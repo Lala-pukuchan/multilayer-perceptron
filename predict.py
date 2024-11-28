@@ -8,7 +8,7 @@ mlp = MLP(layers=[])  # Initialize with empty layers, will be overwritten by loa
 mlp.load_model("resources/mlp_model.pkl")
 
 # Load the test data from CSV
-data = pd.read_csv("./resources/predict.csv", header=None)
+data = pd.read_csv("./resources/data.csv", header=None)
 
 # Find the column that contains 'M' or 'B'
 diagnosis_column = None
