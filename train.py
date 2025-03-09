@@ -48,6 +48,7 @@ def train(
         raise ValueError("create_data returned None")
 
     # define layers
+    # example layers is [30, 24, 24, 2]
     layers = [X_train.shape[1], *hidden_layers_neuron, 2]
 
     # print parameters

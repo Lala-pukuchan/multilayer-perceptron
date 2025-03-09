@@ -161,3 +161,4 @@ cython_debug/
 data_training.csv
 data_validation.csv
 mlp_model.pkl
+*.pdf
