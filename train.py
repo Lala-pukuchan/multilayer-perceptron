@@ -77,7 +77,7 @@ def main():
         nargs="+",
         type=int,
         default=[24, 24],
-        help="Layer size and neuron size of each in hidden layer",
+        help="Layer size and neuron size of each in hidden layer. Examples: '--layer 24 24' for two hidden layers, '--layer 32 16 8' for three layers with decreasing size",
     )
     parser.add_argument("--epochs", type=int, default=1000, help="Number of epochs")
     parser.add_argument(
