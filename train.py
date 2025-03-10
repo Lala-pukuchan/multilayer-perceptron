@@ -7,23 +7,26 @@ import os
 
 def create_data(data):
     """
-    Create data for training/validation
+    Create training/validation data according to the new data format
+    Data format:
+      Column 0: ID
+      Column 1: diagnosis (M or B)
+      Column 2+: features
     """
+    # Extract diagnosis from column 1 as labels, convert M to 1 and B to 0
+    y = data.iloc[:, 1].apply(lambda x: 1 if x == "M" else 0)
 
-    print("data: ", data)
+    # Extract features from column 2 onwards (ID is not used)
+    X = data.iloc[:, 2:]
 
-    # split data to X and y
-    X = data.drop("diagnosis", axis=1)
-    y = data["diagnosis"]
-
-    # Standarize data
+    # Standardize features
     X = (X - X.mean()) / X.std()
 
-    # convert to 2d numpy array
+    # One-hot encoding (not like 0 -> [1, 0], 1 -> [0, 1], but here converts using index=label)
     num_samples = y.shape[0]
     num_classes = 2
     y_2d_array = np.zeros((num_samples, num_classes))
-    y_2d_array[np.arange(num_samples), y] = 1
+    y_2d_array[np.arange(num_samples), y.values] = 1
 
     return X, y_2d_array
 
@@ -31,7 +34,6 @@ def create_data(data):
 def train(
     hidden_layers_neuron,
     epochs,
-    loss,
     batch_size,
     learning_rate,
 ):
@@ -41,7 +43,7 @@ def train(
     # import data
     data_train = pd.read_csv("resources/data_training.csv")
     X_train, y_train_2d_array = create_data(data_train)
-    data_valid = pd.read_csv("resources/data_validation.csv")
+    data_valid = pd.read_csv("resources/data_test.csv")
     X_valid, y_valid_2d_array = create_data(data_valid)
 
     if X_train is None:
@@ -63,14 +65,17 @@ def train(
     mlp.fit(X_train, y_train_2d_array, X_valid, y_valid_2d_array, epochs, learning_rate)
     mlp.save_model("resources/mlp_model.pkl")
 
+
 def main():
 
+    # check file exists
     if not os.path.exists("resources/data_training.csv") or not os.path.exists(
-        "resources/data_validation.csv"
+        "resources/data_test.csv"
     ):
-        print("resources/data_training.csv not found.")
+        print("Please execute separate.py first")
         return
 
+    # parse arguments
     parser = argparse.ArgumentParser(description="Train MLP model")
     parser.add_argument(
         "--layer",
@@ -87,13 +92,19 @@ def main():
     parser.add_argument(
         "--learning_rate", type=float, default=0.1, help="Learning rate"
     )
+    parser.add_argument(
+        "--metrics",
+        nargs="+",
+        type=str,
+        default=["accuracy", "precision", "recall", "f1"],
+        help="Evaluation metrics. Available options: accuracy, precision, recall, f1.",
+    )
 
     args = parser.parse_args()
 
     train(
         hidden_layers_neuron=args.layer,
         epochs=args.epochs,
-        loss=args.loss,
         batch_size=args.batch_size,
         learning_rate=args.learning_rate,
     )
