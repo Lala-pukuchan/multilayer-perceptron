@@ -113,12 +113,19 @@ class MLP:
         y_valid,
         epochs,
         learning_rate,
+        batch_size=32,
         early_stop=False,
         patience=10,
     ):
         """
-        train the model
+        Train the model using mini-batch gradient descent.
         """
+        # Convert to numpy arrays if needed
+        if hasattr(X_train, "values"):
+            X_train = X_train.values
+        if hasattr(X_valid, "values"):
+            X_valid = X_valid.values
+
         train_losses = []
         val_losses = []
         train_accuracies = []
@@ -127,37 +134,55 @@ class MLP:
         best_val_loss = float("inf")
         patience_counter = 0
 
+        n_samples = X_train.shape[0]
+        num_batches = int(np.ceil(n_samples / batch_size))
+
         for epoch in range(epochs):
-            # forward propagation on training data
-            self.forward_propagation(X_train)
+            # Shuffle training data at the beginning of each epoch
+            permutation = np.random.permutation(n_samples)
+            X_train_shuffled = X_train[permutation]
+            y_train_shuffled = y_train[permutation]
 
-            # compute training loss and accuracy
-            train_loss = self.compute_loss(y_train, self.a[-1])
-            train_accuracy = self.compute_accuracy(y_train, self.a[-1])
+            epoch_loss = 0
+            epoch_accuracy = 0
 
-            # back propagation
-            self.back_propagation(y_train, learning_rate)
+            for batch in range(num_batches):
+                start = batch * batch_size
+                end = min(start + batch_size, n_samples)
+                X_batch = X_train_shuffled[start:end]
+                y_batch = y_train_shuffled[start:end]
 
-            # forward propagation on validation data
+                # Forward propagation for the current batch
+                self.forward_propagation(X_batch)
+                batch_loss = self.compute_loss(y_batch, self.a[-1])
+                batch_accuracy = self.compute_accuracy(y_batch, self.a[-1])
+
+                # Accumulate loss and accuracy weighted by batch size
+                epoch_loss += batch_loss * (end - start)
+                epoch_accuracy += batch_accuracy * (end - start)
+
+                # Back propagation on the current batch
+                self.back_propagation(y_batch, learning_rate)
+
+            # Average epoch metrics
+            epoch_loss /= n_samples
+            epoch_accuracy /= n_samples
+            train_losses.append(epoch_loss)
+            train_accuracies.append(epoch_accuracy)
+
+            # Evaluate on the full validation set
             self.forward_propagation(X_valid)
-
-            # compute validation loss and accuracy
             val_loss = self.compute_loss(y_valid, self.a[-1])
             val_accuracy = self.compute_accuracy(y_valid, self.a[-1])
-
-            # store losses and accuracies
-            train_losses.append(train_loss)
             val_losses.append(val_loss)
-            train_accuracies.append(train_accuracy)
             val_accuracies.append(val_accuracy)
 
-            # print losses and accuracies
             print(
-                f"Epoch {epoch+1}/{epochs} - loss: {train_loss:.4f} - val_loss: {val_loss:.4f} - acc: {train_accuracy:.4f} - val_acc: {val_accuracy:.4f}"
+                f"Epoch {epoch+1}/{epochs} - loss: {epoch_loss:.4f} - val_loss: {val_loss:.4f} - acc: {epoch_accuracy:.4f} - val_acc: {val_accuracy:.4f}"
             )
 
             if early_stop:
-                # early stopping: only reset counter if improvement > 0.001
+                # Early stopping: only reset counter if improvement > 0.001
                 if val_loss < best_val_loss - 0.001:
                     best_val_loss = val_loss
                     patience_counter = 0
@@ -169,12 +194,8 @@ class MLP:
                         )
                         break
 
-        # Plotting the results
-        if early_stop:
-            epochs_range = range(1, len(train_losses) + 1)
-        else:
-            epochs_range = range(1, epochs + 1)
-
+        # Plotting the results using the recorded epochs
+        epochs_range = range(1, len(train_losses) + 1)
         plt.figure(figsize=(12, 5))
 
         # Plot loss
@@ -197,6 +218,7 @@ class MLP:
 
         plt.tight_layout()
         plt.show()
+
 
     def save_model(self, file_path):
         """

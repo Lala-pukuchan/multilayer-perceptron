@@ -33,7 +33,7 @@ def train(
 
     # initialize MLP
     mlp = MLP(layers)
-    mlp.fit(X_train, y_train_2d_array, X_valid, y_valid_2d_array, epochs, learning_rate, early_stop=early_stop)
+    mlp.fit(X_train, y_train_2d_array, X_valid, y_valid_2d_array, epochs, learning_rate, early_stop=early_stop, batch_size=batch_size)
 
     print("> saving model 'resources/mlp_model.pkl' to disk...")
     mlp.save_model("resources/mlp_model.pkl")
