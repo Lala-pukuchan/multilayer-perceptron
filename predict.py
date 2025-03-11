@@ -21,6 +21,22 @@ predictions = mlp.a[-1]
 loss = mlp.compute_loss(y_test_2d, predictions)
 accuracy = mlp.compute_accuracy(y_test_2d, predictions)
 
+# Calculate Recall and F1 Score for positive class (assumed label = 1)
+pred_labels = np.argmax(predictions, axis=1)
+true_labels = np.argmax(y_test_2d, axis=1)
+
+# True Positives, False Positives, False Negatives
+TP = np.sum((pred_labels == 1) & (true_labels == 1))
+FP = np.sum((pred_labels == 1) & (true_labels == 0))
+FN = np.sum((pred_labels != 1) & (true_labels == 1))
+
+recall = TP / (TP + FN + 1e-9)         # Recall = TP / (TP + FN)
+precision = TP / (TP + FP + 1e-9)        # Precision = TP / (TP + FP)
+f1_score = 2 * precision * recall / (precision + recall + 1e-9)  # F1 Score = 2 * (precision*recall)/(precision+recall)
+
+# Print results
 print(f"Predictions: {predictions}")
 print(f"Binary Cross-Entropy Loss: {loss:.4f}")
 print(f"Accuracy: {accuracy:.4f}")
+print(f"Recall: {recall:.4f}")
+print(f"F1 Score: {f1_score:.4f}")
