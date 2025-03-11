@@ -49,20 +49,18 @@ def train(
     if X_train is None:
         raise ValueError("create_data returned None")
 
-    # define layers
-    # example layers is [30, 24, 24, 2]
-    layers = [X_train.shape[1], *hidden_layers_neuron, 2]
+    # Print shapes
+    print(f"x_train shape: {X_train.shape}")
+    print(f"x_valid shape: {X_valid.shape}")
 
-    # print parameters
-    print(f"layers: {layers}")
-    print(f"epochs: {epochs}")
-    print(f"batch_size: {batch_size}")
-    print(f"learning_rate: {learning_rate}")
-    print(f"y_train_2d_array: {y_train_2d_array.shape}")
+    # define layers
+    layers = [X_train.shape[1], *hidden_layers_neuron, 2]
 
     # initialize MLP
     mlp = MLP(layers)
     mlp.fit(X_train, y_train_2d_array, X_valid, y_valid_2d_array, epochs, learning_rate)
+    
+    print("> saving model 'resources/mlp_model.pkl' to disk...")
     mlp.save_model("resources/mlp_model.pkl")
 
 
@@ -101,6 +99,16 @@ def main():
     )
 
     args = parser.parse_args()
+
+    # Print chosen arguments and defaults
+    print("\nSelected parameters:")
+    print(f"Hidden layers: {args.layer} (default: [24, 24])")
+    print(f"Epochs: {args.epochs} (default: 1000)")
+    print(f"Batch size: {args.batch_size} (default: 32)")
+    print(f"Learning rate: {args.learning_rate} (default: 0.1)")
+    print(f"Loss function: {args.loss} (default: binary_crossentropy)")
+    print(f"Metrics: {args.metrics} (default: ['accuracy', 'precision', 'recall', 'f1'])")
+    print("\n")
 
     train(
         hidden_layers_neuron=args.layer,
