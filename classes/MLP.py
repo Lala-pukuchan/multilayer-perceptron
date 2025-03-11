@@ -105,7 +105,17 @@ class MLP:
         accuracy = np.mean(predictions == labels)
         return accuracy
 
-    def fit(self, X_train, y_train, X_valid, y_valid, epochs, learning_rate):
+    def fit(
+        self,
+        X_train,
+        y_train,
+        X_valid,
+        y_valid,
+        epochs,
+        learning_rate,
+        early_stop=False,
+        patience=10,
+    ):
         """
         train the model
         """
@@ -113,6 +123,9 @@ class MLP:
         val_losses = []
         train_accuracies = []
         val_accuracies = []
+
+        best_val_loss = float("inf")
+        patience_counter = 0
 
         for epoch in range(epochs):
             # forward propagation on training data
@@ -139,29 +152,47 @@ class MLP:
             val_accuracies.append(val_accuracy)
 
             # print losses and accuracies
-            print(f"Epoch {epoch+1}/{epochs} - loss: {train_loss:.4f} - val_loss: {val_loss:.4f} - acc: {train_accuracy:.4f} - val_acc: {val_accuracy:.4f}")
+            print(
+                f"Epoch {epoch+1}/{epochs} - loss: {train_loss:.4f} - val_loss: {val_loss:.4f} - acc: {train_accuracy:.4f} - val_acc: {val_accuracy:.4f}"
+            )
+
+            if early_stop:
+                # early stopping: only reset counter if improvement > 0.001
+                if val_loss < best_val_loss - 0.001:
+                    best_val_loss = val_loss
+                    patience_counter = 0
+                else:
+                    patience_counter += 1
+                    if patience_counter >= patience:
+                        print(
+                            f"Early stopping at epoch {epoch+1}: Validation loss did not improve for {patience} consecutive epochs."
+                        )
+                        break
 
         # Plotting the results
-        epochs_range = range(1, epochs + 1)
+        if early_stop:
+            epochs_range = range(1, len(train_losses) + 1)
+        else:
+            epochs_range = range(1, epochs + 1)
 
         plt.figure(figsize=(12, 5))
 
         # Plot loss
         plt.subplot(1, 2, 1)
-        plt.plot(epochs_range, train_losses, label='Training Loss')
-        plt.plot(epochs_range, val_losses, label='Validation Loss')
-        plt.xlabel('Epochs')
-        plt.ylabel('Loss')
-        plt.title('Loss over Epochs')
+        plt.plot(epochs_range, train_losses, label="Training Loss")
+        plt.plot(epochs_range, val_losses, label="Validation Loss")
+        plt.xlabel("Epochs")
+        plt.ylabel("Loss")
+        plt.title("Loss over Epochs")
         plt.legend()
 
         # Plot accuracy
         plt.subplot(1, 2, 2)
-        plt.plot(epochs_range, train_accuracies, label='Training Accuracy')
-        plt.plot(epochs_range, val_accuracies, label='Validation Accuracy')
-        plt.xlabel('Epochs')
-        plt.ylabel('Accuracy')
-        plt.title('Accuracy over Epochs')
+        plt.plot(epochs_range, train_accuracies, label="Training Accuracy")
+        plt.plot(epochs_range, val_accuracies, label="Validation Accuracy")
+        plt.xlabel("Epochs")
+        plt.ylabel("Accuracy")
+        plt.title("Accuracy over Epochs")
         plt.legend()
 
         plt.tight_layout()
@@ -172,19 +203,19 @@ class MLP:
         Save the model to a file
         """
         model_data = {
-            'layers': self.layers,
-            'weights': self.weights,
-            'biases': self.biases
+            "layers": self.layers,
+            "weights": self.weights,
+            "biases": self.biases,
         }
-        with open(file_path, 'wb') as file:
+        with open(file_path, "wb") as file:
             pickle.dump(model_data, file)
 
     def load_model(self, file_path):
         """
         Load the model from a file
         """
-        with open(file_path, 'rb') as file:
+        with open(file_path, "rb") as file:
             model_data = pickle.load(file)
-            self.layers = model_data['layers']
-            self.weights = model_data['weights']
-            self.biases = model_data['biases']
+            self.layers = model_data["layers"]
+            self.weights = model_data["weights"]
+            self.biases = model_data["biases"]

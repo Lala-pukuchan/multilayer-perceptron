@@ -10,6 +10,7 @@ def train(
     epochs,
     batch_size,
     learning_rate,
+    early_stop,
 ):
     """
     Train MLP model
@@ -32,7 +33,7 @@ def train(
 
     # initialize MLP
     mlp = MLP(layers)
-    mlp.fit(X_train, y_train_2d_array, X_valid, y_valid_2d_array, epochs, learning_rate)
+    mlp.fit(X_train, y_train_2d_array, X_valid, y_valid_2d_array, epochs, learning_rate, early_stop=early_stop)
 
     print("> saving model 'resources/mlp_model.pkl' to disk...")
     mlp.save_model("resources/mlp_model.pkl")
@@ -65,14 +66,17 @@ def main():
         "--learning_rate", type=float, default=0.1, help="Learning rate"
     )
     parser.add_argument(
-        "--metrics",
-        nargs="+",
+        "--early_stop",
         type=str,
-        default=["accuracy", "precision", "recall", "f1"],
-        help="Evaluation metrics. Available options: accuracy, precision, recall, f1.",
+        choices=['True', 'False'],
+        default='False',
+        help="Enable early stopping (default: False)"
     )
 
     args = parser.parse_args()
+
+    # Convert early_stop string to boolean
+    early_stop = args.early_stop == 'True'
 
     # Print chosen arguments and defaults
     print("\nSelected parameters:")
@@ -81,9 +85,7 @@ def main():
     print(f"Batch size: {args.batch_size} (default: 32)")
     print(f"Learning rate: {args.learning_rate} (default: 0.1)")
     print(f"Loss function: {args.loss} (default: binary_crossentropy)")
-    print(
-        f"Metrics: {args.metrics} (default: ['accuracy', 'precision', 'recall', 'f1'])"
-    )
+    print(f"Early stopping: {early_stop} (default: False)")
     print("\n")
 
     train(
@@ -91,6 +93,7 @@ def main():
         epochs=args.epochs,
         batch_size=args.batch_size,
         learning_rate=args.learning_rate,
+        early_stop=early_stop,
     )
 
 
