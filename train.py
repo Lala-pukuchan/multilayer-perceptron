@@ -57,13 +57,13 @@ def main():
         default=[24, 24],
         help="Layer size and neuron size of each in hidden layer. Examples: '--layer 24 24' for two hidden layers, '--layer 32 16 8' for three layers with decreasing size",
     )
-    parser.add_argument("--epochs", type=int, default=100, help="Number of epochs")
+    parser.add_argument("--epochs", type=int, default=200, help="Number of epochs")
     parser.add_argument(
         "--loss", type=str, default="binary_crossentropy", help="Loss function"
     )
-    parser.add_argument("--batch_size", type=int, default=32, help="Batch size")
+    parser.add_argument("--batch_size", type=int, default=8, help="Batch size")
     parser.add_argument(
-        "--learning_rate", type=float, default=0.8, help="Learning rate"
+        "--learning_rate", type=float, default=0.01, help="Learning rate"
     )
     parser.add_argument(
         "--early_stop",
