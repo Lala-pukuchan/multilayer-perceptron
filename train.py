@@ -81,9 +81,9 @@ def main():
     # Print chosen arguments and defaults
     print("\nSelected parameters:")
     print(f"Hidden layers: {args.layer} (default: [24, 24])")
-    print(f"Epochs: {args.epochs} (default: 100)")
-    print(f"Batch size: {args.batch_size} (default: 32)")
-    print(f"Learning rate: {args.learning_rate} (default: 0.1)")
+    print(f"Epochs: {args.epochs} (default: 200)")
+    print(f"Batch size: {args.batch_size} (default: 8)")
+    print(f"Learning rate: {args.learning_rate} (default: 0.01)")
     print(f"Loss function: {args.loss} (default: binary_crossentropy)")
     print(f"Early stopping: {early_stop} (default: False)")
     print("\n")
